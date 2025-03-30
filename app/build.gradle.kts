@@ -98,5 +98,34 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(libs.junit4)
+
+    // JUnit5 & Spek
+    testImplementation(libs.junit5)
+    testRuntimeOnly(libs.junit5.vintage)
+
+    // MockK for mocking
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockk.agent)
+
+    // Koin Test
+    testImplementation(libs.koin.test)
+    testImplementation(libs.koin.test.junit5)
+
+    // Coroutines & Flow Testing
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.turbine)
+
+    // Room Database Test
+    testImplementation(libs.room.testing)
+
+    // Mock Web Server
+    testImplementation(libs.mock.webserver)
+
+    // Truth Assertions
+    testImplementation(libs.truth)
+
+    // Robolectric for Android unit testing
+    testImplementation(libs.robolectric)
 
 }
