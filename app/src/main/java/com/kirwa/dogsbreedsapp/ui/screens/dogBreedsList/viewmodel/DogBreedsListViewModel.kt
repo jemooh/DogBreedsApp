@@ -1,23 +1,23 @@
-package com.kirwa.dogsbreedsapp.ui.listscreens.viewmodel
+package com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kirwa.dogsbreedsapp.domain.repository.DogBreedsRepository
-import com.kirwa.dogsbreedsapp.ui.listscreens.model.DogBreedsState
+import com.kirwa.dogsbreedsapp.ui.screens.favouriteDogBreeds.model.FavouriteUiState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import com.kirwa.dogsbreedsapp.data.remote.model.Result
+import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.model.DogBreedsListUiState
 
-class DogBreedsViewModel(private val dogBreedsRepository: DogBreedsRepository) :
+class DogBreedsListViewModel(private val dogBreedsRepository: DogBreedsRepository) :
     ViewModel() {
-    private val _state = MutableStateFlow(DogBreedsState())
-    val state: StateFlow<DogBreedsState> = _state
+    private val _state = MutableStateFlow(DogBreedsListUiState())
+    val state: StateFlow<DogBreedsListUiState> = _state
 
-    init {
+    /*init {
         fetchRemoteDogBreeds()
-    }
+    }*/
 
     fun fetchRemoteDogBreeds() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -53,12 +53,5 @@ class DogBreedsViewModel(private val dogBreedsRepository: DogBreedsRepository) :
             }.launchIn(viewModelScope)
     }
 
-    fun getLocalFavouriteDogBreeds() {
-        dogBreedsRepository.getLocalFavouriteDogBreeds().onEach { favorites ->
-            _state.value = state.value.copy(
-                favouriteDogBreeds = favorites
-            )
-        }.launchIn(viewModelScope)
-    }
 }
 

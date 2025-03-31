@@ -8,8 +8,9 @@ import com.kirwa.dogsbreedsapp.data.local.datasource.SharedPreferences
 import com.kirwa.dogsbreedsapp.data.remote.apiService.DogsApiService
 import com.kirwa.dogsbreedsapp.data.repository.DogBreedsRepositoryImpl
 import com.kirwa.dogsbreedsapp.domain.repository.DogBreedsRepository
-import com.kirwa.dogsbreedsapp.ui.detailscreen.viewmodel.DogBreedDetailViewModel
-import com.kirwa.dogsbreedsapp.ui.listscreens.viewmodel.DogBreedsViewModel
+import com.kirwa.dogsbreedsapp.ui.screens.dogBreedDetails.viewmodel.DogBreedDetailViewModel
+import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel.DogBreedsListViewModel
+import com.kirwa.dogsbreedsapp.ui.screens.favouriteDogBreeds.viewmodel.FavouriteDogBreedsViewModel
 import com.kirwa.dogsbreedsapp.utils.Constants
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -43,7 +44,7 @@ val appModule = module {
         get<DogsDatabase>().favouriteDogBreedsDao
     }
 
-    factory<DogBreedsRepository> {
+    single<DogBreedsRepository> {
         DogBreedsRepositoryImpl(
             dogsApiService = get(),
             dogBreedsDao = get(),
@@ -52,11 +53,15 @@ val appModule = module {
     }
 
     viewModel {
-        DogBreedsViewModel(dogBreedsRepository = get())
+        DogBreedsListViewModel(dogBreedsRepository = get())
     }
 
     viewModel {
         DogBreedDetailViewModel(dogBreedsRepository = get())
+    }
+
+    viewModel {
+        FavouriteDogBreedsViewModel(dogBreedsRepository = get())
     }
 
     single {

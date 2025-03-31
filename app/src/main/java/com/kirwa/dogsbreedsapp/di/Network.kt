@@ -1,6 +1,7 @@
 package com.kirwa.dogsbreedsapp.di
 
 //import com.tech.dvtweatherapp.BuildConfig
+import com.kirwa.dogsbreedsapp.BuildConfig
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import okhttp3.*
@@ -40,10 +41,10 @@ private class BasicAuthInterceptor(val apiKey: String) : Interceptor {
 fun httpClient(apiKey: String): OkHttpClient {
     val httpLoggingInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger.DEFAULT)
     val clientBuilder = OkHttpClient.Builder()
-    //if (BuildConfig.DEBUG) {
-       /* httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-        clientBuilder.addInterceptor(httpLoggingInterceptor)*/
-    //}
+    if (BuildConfig.DEBUG) {
+        httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+        clientBuilder.addInterceptor(httpLoggingInterceptor)
+    }
     clientBuilder.addInterceptor(BasicAuthInterceptor(apiKey))
     clientBuilder.readTimeout(120, TimeUnit.SECONDS)
     clientBuilder.writeTimeout(120, TimeUnit.SECONDS)

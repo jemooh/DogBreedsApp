@@ -10,6 +10,6 @@ interface DogsApiService {
     suspend fun fetchDogBreeds(
         @Query("limit") limit: Int,
         @Query("page") page: Int
-    ): Response<DogBreedsResponse>
+    ): Response<List<DogBreedsResponse>>
 
 }

@@ -28,23 +28,27 @@ internal class DogBreedsRepositoryImpl(
                 val page = 1
                 val result = dogsApiService.fetchDogBreeds(limit, page)
                 if (result.isSuccessful) {
-                    result.body()?.apply {
-                        val dogBreed = id?.let {id ->
-                            DogBreed(
-                                id= id,
-                                name,
-                                weight=weight?.metric,
-                                height=height?.metric,
-                                bredFor=bredFor,
-                                breedGroup=breedGroup,
-                                temperament=temperament,
-                                origin=origin,
-                                lifeSpan=lifeSpan,
-                                referenceImageId=referenceImageId,
-                                imageUrl=image?.url
-                            )
+
+                    result.body()?.forEach { remoteDogBreed ->
+                        remoteDogBreed.apply {
+                            val dogBreed = id?.let { id ->
+                                DogBreed(
+                                    id = id,
+                                    name,
+                                    weight = weight?.metric,
+                                    height = height?.metric,
+                                    bredFor = bredFor,
+                                    breedGroup = breedGroup,
+                                    temperament = temperament,
+                                    origin = origin,
+                                    lifeSpan = lifeSpan,
+                                    referenceImageId = referenceImageId,
+                                    imageUrl = image?.url
+                                )
+                            }
+                            dogBreed?.let { dogBreedsDao.insertAsync(it) }
                         }
-                        dogBreed?.let { dogBreedsDao.insertAsync(it) }
+
                     }
                     Result.Success(true)
                 } else {

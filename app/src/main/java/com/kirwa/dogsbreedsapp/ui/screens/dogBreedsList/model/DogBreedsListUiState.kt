@@ -1,9 +1,9 @@
-package com.kirwa.dogsbreedsapp.ui.listscreens.model
+package com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.model
 
 import com.kirwa.dogsbreedsapp.domain.model.DogBreed
 import com.kirwa.dogsbreedsapp.domain.model.FavouriteDogBreed
 
-data class DogBreedsState (
+data class DogBreedsListUiState (
     val dogs: List<DogBreed> = emptyList(),
     val favouriteDogBreeds: List<FavouriteDogBreed> = emptyList(),
     val dog: DogBreed? = null,
