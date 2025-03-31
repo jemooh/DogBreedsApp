@@ -90,6 +90,8 @@ dependencies {
     // Image Loading (Coil)
     implementation(libs.coil.compose)
 
+    implementation(libs.timber)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -115,6 +117,8 @@ dependencies {
     // Coroutines & Flow Testing
     testImplementation(libs.coroutines.test)
     testImplementation(libs.turbine)
+    testImplementation(libs.core.testing)
+
 
     // Room Database Test
     testImplementation(libs.room.testing)

@@ -30,6 +30,8 @@ coroutinesTest = "1.5.1"
 turbine = "0.7.0"
 roomTesting = "2.4.0-alpha04"
 mockWebServer = "5.0.0-alpha.2"
+timber = "5.0.0"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -94,6 +96,9 @@ turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine
 
 room-testing = { group = "androidx.room", name = "room-testing", version.ref = "roomTesting" }
 mock-webserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "mockWebServer" }
+
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+
 
 
 [plugins]
