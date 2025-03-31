@@ -8,6 +8,8 @@ import com.kirwa.dogsbreedsapp.data.remote.model.Result
 interface DogBreedsRepository {
     suspend fun fetchRemoteDogBreeds(): Result<Boolean>
     fun getLocalDogBreeds(): Flow<List<DogBreed>>
+    fun getDogBreedById(id: Int): Flow<DogBreed>
+    fun getFavouriteDogBreedById(id: Int): Flow<FavouriteDogBreed>
     fun getLocalFavouriteDogBreeds(): Flow<List<FavouriteDogBreed>>
 
     fun searchLocalDogBreeds(query: String): Flow<List<DogBreed>>

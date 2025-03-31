@@ -10,6 +10,9 @@ interface FavouriteDogBreedsDao : CoroutineBaseDao<FavouriteDogBreed> {
     @Query("SELECT * FROM FavouriteDogBreed order by name ASC Limit 100 ")
     fun getFavouriteDogBreeds(): Flow<List<FavouriteDogBreed>>
 
+    @Query("SELECT * FROM FavouriteDogBreed WHERE id = :id ")
+    fun getFavouriteDogBreedById(id: Int): Flow<FavouriteDogBreed>
+
     @Query("SELECT * FROM FavouriteDogBreed WHERE name  LIKE :searchString ")
     fun searchFavouriteDogBreeds(searchString: String?): Flow<List<FavouriteDogBreed>>
 }

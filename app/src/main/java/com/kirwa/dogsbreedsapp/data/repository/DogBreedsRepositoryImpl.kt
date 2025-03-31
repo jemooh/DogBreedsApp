@@ -65,6 +65,14 @@ internal class DogBreedsRepositoryImpl(
         return dogBreedsDao.getDogBreeds()
     }
 
+    override fun getDogBreedById(id: Int): Flow<DogBreed> {
+        return dogBreedsDao.getDogBreedById(id)
+    }
+
+    override fun getFavouriteDogBreedById(id: Int): Flow<FavouriteDogBreed> {
+        return favouriteDogBreedsDao.getFavouriteDogBreedById(id)
+    }
+
     override fun getLocalFavouriteDogBreeds(): Flow<List<FavouriteDogBreed>> {
         return favouriteDogBreedsDao.getFavouriteDogBreeds()
     }

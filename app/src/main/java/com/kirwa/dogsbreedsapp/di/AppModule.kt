@@ -8,6 +8,8 @@ import com.kirwa.dogsbreedsapp.data.local.datasource.SharedPreferences
 import com.kirwa.dogsbreedsapp.data.remote.apiService.DogsApiService
 import com.kirwa.dogsbreedsapp.data.repository.DogBreedsRepositoryImpl
 import com.kirwa.dogsbreedsapp.domain.repository.DogBreedsRepository
+import com.kirwa.dogsbreedsapp.ui.detailscreen.viewmodel.DogBreedDetailViewModel
+import com.kirwa.dogsbreedsapp.ui.listscreens.viewmodel.DogBreedsViewModel
 import com.kirwa.dogsbreedsapp.utils.Constants
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -47,6 +49,14 @@ val appModule = module {
             dogBreedsDao = get(),
             favouriteDogBreedsDao = get()
         )
+    }
+
+    viewModel {
+        DogBreedsViewModel(dogBreedsRepository = get())
+    }
+
+    viewModel {
+        DogBreedDetailViewModel(dogBreedsRepository = get())
     }
 
     single {
