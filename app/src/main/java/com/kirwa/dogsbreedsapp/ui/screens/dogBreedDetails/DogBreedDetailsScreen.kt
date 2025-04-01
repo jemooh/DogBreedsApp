@@ -41,13 +41,15 @@ import com.kirwa.dogsbreedsapp.R
 import com.kirwa.dogsbreedsapp.domain.model.FavouriteDogBreed
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedDetails.viewmodel.DogBreedDetailViewModel
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel.DogBreedsListViewModel
+import com.kirwa.dogsbreedsapp.ui.screens.favouriteDogBreeds.viewmodel.FavouriteDogBreedsViewModel
 import com.kirwa.dogsbreedsapp.utils.Constants
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun DogDetailsScreen(dogId: String, navController: NavController) {
+fun DogBreedDetailsScreen(dogId: String, navController: NavController) {
     val dogBreedsViewModel: DogBreedDetailViewModel = koinViewModel()
+    val favouriteDogBreedsViewModel: FavouriteDogBreedsViewModel = koinViewModel()
     val scrollState = rememberScrollState()
 
     LaunchedEffect(dogId) {
@@ -138,7 +140,7 @@ fun DogDetailsScreen(dogId: String, navController: NavController) {
             onClick = {
                 if (isFavorite) {
                     dog?.let {
-                        dogBreedsViewModel.deleteFavouriteDogBreed(it.id)
+                        favouriteDogBreedsViewModel.deleteFavouriteDogBreed(it.id)
                     }
                 } else {
                     dog?.let {
@@ -155,7 +157,7 @@ fun DogDetailsScreen(dogId: String, navController: NavController) {
                             origin = it.origin,
                             imageUrl = it.imageUrl
                         )
-                        dogBreedsViewModel.saveFavouriteDogBreed(favouriteDogBreed)
+                        favouriteDogBreedsViewModel.saveFavouriteDogBreed(favouriteDogBreed)
                     }
                 }
                 isFavorite = !isFavorite

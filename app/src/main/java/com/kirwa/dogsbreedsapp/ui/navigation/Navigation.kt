@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.kirwa.dogsbreedsapp.ui.screens.dogBreedDetails.DogDetailsScreen
+import com.kirwa.dogsbreedsapp.ui.screens.dogBreedDetails.DogBreedDetailsScreen
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.HomeScreen
 import com.kirwa.dogsbreedsapp.ui.screens.favouriteDogBreeds.FavouriteScreen
 
@@ -15,7 +15,7 @@ fun Navigation(navController: NavHostController) {
         composable(NavigationItem.Favourites.route) { FavouriteScreen(navController) }
         composable(NavigationItem.DogBreedDetails.route) { backStackEntry ->
             val dogId = backStackEntry.arguments?.getString("dogId")
-            DogDetailsScreen(dogId = dogId ?: "", navController)
+            DogBreedDetailsScreen(dogId = dogId ?: "", navController)
         }
     }
 }

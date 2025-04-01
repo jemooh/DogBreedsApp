@@ -1,4 +1,4 @@
-package com.kirwa.dogsbreedsapp
+package com.kirwa.dogsbreedsapp.ui.screens
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -21,7 +21,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             DogsBreedsAppTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -32,22 +31,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-/*
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    val dogBreedsListViewModel: DogBreedsListViewModel = koinViewModel()
-    dogBreedsListViewModel.fetchRemoteDogBreeds()
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DogsBreedsAppTheme {
-        Greeting("Android")
-    }
-}*/

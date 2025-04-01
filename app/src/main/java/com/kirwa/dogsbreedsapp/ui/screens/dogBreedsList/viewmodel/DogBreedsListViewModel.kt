@@ -8,20 +8,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import com.kirwa.dogsbreedsapp.data.remote.model.Result
+import com.kirwa.dogsbreedsapp.domain.usecase.dogBreedsList.DogBreedsListUseCase
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.model.DogBreedsListUiState
 
-class DogBreedsListViewModel(private val dogBreedsRepository: DogBreedsRepository) :
+class DogBreedsListViewModel(private val dogBreedsListUseCase: DogBreedsListUseCase) :
     ViewModel() {
     private val _state = MutableStateFlow(DogBreedsListUiState())
     val state: StateFlow<DogBreedsListUiState> = _state
 
-    /*init {
+    init {
         fetchRemoteDogBreeds()
-    }*/
+    }
 
     fun fetchRemoteDogBreeds() {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val result = dogBreedsRepository.fetchRemoteDogBreeds()) {
+            when (val result = dogBreedsListUseCase.fetchRemoteDogBreeds()) {
                 is Result.Loading -> {
                     _state.value = state.value.copy(
                         isRefreshing = true
@@ -45,7 +46,7 @@ class DogBreedsListViewModel(private val dogBreedsRepository: DogBreedsRepositor
     }
 
     fun getLocalDogBreeds() {
-        dogBreedsRepository.getLocalDogBreeds()
+        dogBreedsListUseCase.getLocalDogBreeds()
             .onEach { dogBreeds ->
                 _state.value = state.value.copy(
                     dogs = dogBreeds

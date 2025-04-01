@@ -8,6 +8,12 @@ import com.kirwa.dogsbreedsapp.data.local.datasource.SharedPreferences
 import com.kirwa.dogsbreedsapp.data.remote.apiService.DogsApiService
 import com.kirwa.dogsbreedsapp.data.repository.DogBreedsRepositoryImpl
 import com.kirwa.dogsbreedsapp.domain.repository.DogBreedsRepository
+import com.kirwa.dogsbreedsapp.domain.usecase.dogBreedDetails.DogBreedDetailUseCase
+import com.kirwa.dogsbreedsapp.domain.usecase.dogBreedDetails.DogBreedDetailUseCaseImpl
+import com.kirwa.dogsbreedsapp.domain.usecase.dogBreedsList.DogBreedsListUseCase
+import com.kirwa.dogsbreedsapp.domain.usecase.dogBreedsList.DogBreedsListUseCaseImpl
+import com.kirwa.dogsbreedsapp.domain.usecase.favouriteDogBreeds.FavouriteDogBreedsUseCase
+import com.kirwa.dogsbreedsapp.domain.usecase.favouriteDogBreeds.FavouriteDogBreedsUseCaseImpl
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedDetails.viewmodel.DogBreedDetailViewModel
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel.DogBreedsListViewModel
 import com.kirwa.dogsbreedsapp.ui.screens.favouriteDogBreeds.viewmodel.FavouriteDogBreedsViewModel
@@ -53,16 +59,20 @@ val appModule = module {
     }
 
     viewModel {
-        DogBreedsListViewModel(dogBreedsRepository = get())
+        DogBreedsListViewModel(dogBreedsListUseCase = get())
     }
 
     viewModel {
-        DogBreedDetailViewModel(dogBreedsRepository = get())
+        DogBreedDetailViewModel(dogBreedDetailUseCase = get())
     }
 
     viewModel {
-        FavouriteDogBreedsViewModel(dogBreedsRepository = get())
+        FavouriteDogBreedsViewModel(favouriteDogBreedsUseCase = get())
     }
+
+    single<DogBreedsListUseCase> { DogBreedsListUseCaseImpl(get()) }
+    single<DogBreedDetailUseCase> { DogBreedDetailUseCaseImpl(get()) }
+    single<FavouriteDogBreedsUseCase> { FavouriteDogBreedsUseCaseImpl(get()) }
 
     single {
         androidApplication().getSharedPreferences("PREFERENCES", Context.MODE_PRIVATE)

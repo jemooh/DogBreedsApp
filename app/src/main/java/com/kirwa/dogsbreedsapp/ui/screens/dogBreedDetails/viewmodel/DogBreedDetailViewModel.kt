@@ -7,31 +7,21 @@ import com.kirwa.dogsbreedsapp.ui.screens.favouriteDogBreeds.model.FavouriteUiSt
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import com.kirwa.dogsbreedsapp.domain.model.FavouriteDogBreed
+import com.kirwa.dogsbreedsapp.domain.usecase.dogBreedDetails.DogBreedDetailUseCase
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedDetails.model.DogBreedDetailsUiState
 
-class DogBreedDetailViewModel(private val dogBreedsRepository: DogBreedsRepository) :
+class DogBreedDetailViewModel(private val dogBreedDetailUseCase: DogBreedDetailUseCase) :
     ViewModel() {
     private val _state = MutableStateFlow(DogBreedDetailsUiState())
     val state: StateFlow<DogBreedDetailsUiState> = _state
 
     fun getDogBreedById(id:Int) {
-        dogBreedsRepository.getDogBreedById(id).onEach { dogBreed ->
+        dogBreedDetailUseCase.getDogBreedById(id).onEach { dogBreed ->
             _state.value = state.value.copy(
                 dog = dogBreed
             )
         }.launchIn(viewModelScope)
     }
 
-    fun saveFavouriteDogBreed(dogBreed: FavouriteDogBreed) {
-        viewModelScope.launch {
-            dogBreedsRepository.saveFavouriteDogBreed(dogBreed)
-        }
-    }
-
-    fun deleteFavouriteDogBreed(dogInt: Int) {
-        viewModelScope.launch {
-            dogBreedsRepository.deleteFavouriteDogBreed(dogInt)
-        }
-    }
 }
 
