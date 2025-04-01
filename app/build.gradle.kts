@@ -47,7 +47,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    
+
     kotlinOptions {
         jvmTarget = "17"
     }
@@ -148,5 +148,12 @@ dependencies {
 
     // Robolectric for Android unit testing
     testImplementation(libs.robolectric)
+    testImplementation(libs.kotestCore)
+    testImplementation(libs.kotestRunnerJunit5)
+    // Spek Core
+    testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.19")
+
+    // Spek JUnit 5 Engine
+    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.19")
 
 }

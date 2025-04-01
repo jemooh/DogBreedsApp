@@ -18,6 +18,7 @@ class DogBreedsListViewModel(private val dogBreedsListUseCase: DogBreedsListUseC
 
     init {
         fetchRemoteDogBreeds()
+        getLocalDogBreeds()
     }
 
     fun fetchRemoteDogBreeds() {
@@ -41,6 +42,7 @@ class DogBreedsListViewModel(private val dogBreedsListUseCase: DogBreedsListUseC
                         errorMessage = result.exception.message.toString()
                     )
                 }
+                else -> {}
             }
         }
     }

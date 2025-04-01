@@ -30,6 +30,7 @@ coroutinesTest = "1.5.1"
 turbine = "0.7.0"
 roomTesting = "2.4.0-alpha04"
 mockWebServer = "5.0.0-alpha.2"
+kotest = "5.5.4"
 timber = "5.0.0"
 
 
@@ -86,6 +87,9 @@ mockk-agent = { group = "io.mockk", name = "mockk-agent-jvm", version.ref = "moc
 
 koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koinTest" }
 koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5", version.ref = "koinTest" }
+
+kotestCore = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+kotestRunnerJunit5 = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
 
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
