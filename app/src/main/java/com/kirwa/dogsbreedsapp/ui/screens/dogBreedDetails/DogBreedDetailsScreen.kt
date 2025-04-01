@@ -2,9 +2,16 @@ package com.kirwa.dogsbreedsapp.ui.screens.dogBreedDetails
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -13,35 +20,132 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import com.kirwa.dogsbreedsapp.R
+import com.kirwa.dogsbreedsapp.ui.screens.dogBreedDetails.viewmodel.DogBreedDetailViewModel
+import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel.DogBreedsListViewModel
+import com.kirwa.dogsbreedsapp.utils.Constants
+import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun DogDetailsScreen(dogId: String, navController: NavController) {
-    Scaffold(topBar = {
-        TopAppBar(
-            title = { Text("Dog Details") },
-            navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                }
-            }
-        )
-    }) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+    val dogBreedsViewModel: DogBreedDetailViewModel = koinViewModel()
+    dogBreedsViewModel.getDogBreedById(dogId.toInt())
+    val uiState = dogBreedsViewModel.state.collectAsState().value
+    val dog = uiState.dog
+
+    var isFavorite by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState) // Enable scrolling
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val imageUrl = Constants.IMAGES_BASE_URL + "${dog?.referenceImageId}.jpg"
+
+        // Back Button
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { navController.popBackStack() }
+                .padding(vertical = 8.dp)
         ) {
-            val dogImage = rememberImagePainter("https://example.com/image$dogId.jpg")
-            Image(painter = dogImage, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.size(200.dp))
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Dog ID: $dogId", style = MaterialTheme.typography.headlineMedium)
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Back",
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Details", fontWeight = FontWeight.Bold)
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Image(
+            painter = rememberAsyncImagePainter(
+                model = imageUrl,
+                placeholder = painterResource(id = R.drawable.baseline_image_search_24),
+                error = painterResource(id = R.drawable.baseline_image_24)
+            ),
+            contentDescription = dog?.name,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.White)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = dog?.name ?: "Unknown",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            DetailItem(label = "Weight", value = dog?.weight)
+            DetailItem(label = "Height", value = dog?.height)
+            DetailItem(label = "Bred For", value = dog?.bredFor)
+            DetailItem(label = "Breed Group", value = dog?.breedGroup)
+            DetailItem(label = "Temperament", value = dog?.temperament)
+            DetailItem(label = "Origin", value = dog?.origin)
+            DetailItem(label = "Life Span", value = dog?.lifeSpan)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { isFavorite = !isFavorite },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isFavorite) Color.Red else Color.Blue
+            )
+        ) {
+            Text(text = if (isFavorite) "Remove from Favourite" else "Add to Favourite")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp)) // Ensure spacing at the bottom
+    }
+}
+
+
+@Composable
+fun DetailItem(label: String, value: String?) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Text(text = "$label: ", color = Color.Gray, fontWeight = FontWeight.Medium)
+        Text(text = value ?: "N/A", color = Color.Black, fontWeight = FontWeight.Bold)
     }
 }
