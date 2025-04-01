@@ -74,24 +74,12 @@ internal class DogBreedsRepositoryImpl(
         return dogBreedsDao.getDogBreedById(id)
     }
 
-    override fun getFavouriteDogBreedById(id: Int): Flow<FavouriteDogBreed> {
-        return favouriteDogBreedsDao.getFavouriteDogBreedById(id)
+    override suspend fun deleteFavouriteDogBreed(dogId: Int) {
+        favouriteDogBreedsDao.deleteFavouriteDogBreedById(dogId)
     }
 
     override fun getLocalFavouriteDogBreeds(): Flow<List<FavouriteDogBreed>> {
         return favouriteDogBreedsDao.getFavouriteDogBreeds()
-    }
-
-    override fun searchLocalDogBreeds(query: String): Flow<List<DogBreed>> {
-        return dogBreedsDao.searchDogBreeds(query)
-    }
-
-    override fun searchLocalFavouriteDogBreeds(query: String): Flow<List<FavouriteDogBreed>> {
-        return favouriteDogBreedsDao.searchFavouriteDogBreeds(query)
-    }
-
-    override suspend fun deleteFavouriteDogBreed(dog: FavouriteDogBreed) {
-        favouriteDogBreedsDao.deleteAsync(dog)
     }
 
     override suspend fun saveFavouriteDogBreed(dog: FavouriteDogBreed) {

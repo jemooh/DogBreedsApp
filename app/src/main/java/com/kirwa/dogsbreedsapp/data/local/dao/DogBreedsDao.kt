@@ -6,13 +6,32 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DogBreedsDao : CoroutineBaseDao<DogBreed> {
-    @Query("SELECT * FROM DogBreed order by name ASC Limit 100 ")
+    @Query("""
+    SELECT db.*, 
+           CASE 
+               WHEN fd.id IS NOT NULL THEN 1 
+               ELSE 0 
+           END AS isFavourite
+    FROM DogBreed db 
+    LEFT JOIN FavouriteDogBreed fd 
+    ON db.id = fd.id 
+    ORDER BY name ASC 
+    LIMIT 100
+""")
     fun getDogBreeds(): Flow<List<DogBreed>>
 
-    @Query("SELECT * FROM DogBreed WHERE id = :id ")
-    fun getDogBreedById(id: Int): Flow<DogBreed>
 
-    @Query("SELECT * FROM DogBreed WHERE name  LIKE :searchString ")
-    fun searchDogBreeds(searchString: String?): Flow<List<DogBreed>>
+    @Query("""
+    SELECT db.*, 
+           CASE 
+               WHEN fd.id IS NOT NULL THEN 1 
+               ELSE 0 
+           END AS isFavourite
+    FROM DogBreed db 
+    LEFT JOIN FavouriteDogBreed fd 
+    ON db.id = fd.id 
+    WHERE db.id = :id
+""")
+    fun getDogBreedById(id: Int): Flow<DogBreed>
 
 }

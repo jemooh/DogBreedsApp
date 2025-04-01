@@ -20,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +38,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.kirwa.dogsbreedsapp.R
+import com.kirwa.dogsbreedsapp.domain.model.FavouriteDogBreed
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedDetails.viewmodel.DogBreedDetailViewModel
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel.DogBreedsListViewModel
 import com.kirwa.dogsbreedsapp.utils.Constants
@@ -46,17 +48,27 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun DogDetailsScreen(dogId: String, navController: NavController) {
     val dogBreedsViewModel: DogBreedDetailViewModel = koinViewModel()
-    dogBreedsViewModel.getDogBreedById(dogId.toInt())
+    val scrollState = rememberScrollState()
+
+    LaunchedEffect(dogId) {
+        dogBreedsViewModel.getDogBreedById(dogId.toInt())
+    }
+
     val uiState = dogBreedsViewModel.state.collectAsState().value
     val dog = uiState.dog
 
-    var isFavorite by remember { mutableStateOf(false) }
-    val scrollState = rememberScrollState()
+    // Handle the favorite button state
+    var isFavorite by remember { mutableStateOf(dog?.isFavourite ?: false) }
+
+    // Update the isFavorite value if it changes
+    LaunchedEffect(dog?.isFavourite) {
+        isFavorite = dog?.isFavourite ?: false
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(scrollState) // Enable scrolling
+            .verticalScroll(scrollState)
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -123,7 +135,31 @@ fun DogDetailsScreen(dogId: String, navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { isFavorite = !isFavorite },
+            onClick = {
+                if (isFavorite) {
+                    dog?.let {
+                        dogBreedsViewModel.deleteFavouriteDogBreed(it.id)
+                    }
+                } else {
+                    dog?.let {
+                        val favouriteDogBreed = FavouriteDogBreed(
+                            id = it.id ?: 0,
+                            name = it.name,
+                            bredFor = it.bredFor,
+                            height = it.height,
+                            weight = it.weight,
+                            lifeSpan = it.lifeSpan,
+                            temperament = it.temperament,
+                            referenceImageId = it.referenceImageId,
+                            breedGroup = it.breedGroup,
+                            origin = it.origin,
+                            imageUrl = it.imageUrl
+                        )
+                        dogBreedsViewModel.saveFavouriteDogBreed(favouriteDogBreed)
+                    }
+                }
+                isFavorite = !isFavorite
+            },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (isFavorite) Color.Red else Color.Blue
@@ -132,10 +168,9 @@ fun DogDetailsScreen(dogId: String, navController: NavController) {
             Text(text = if (isFavorite) "Remove from Favourite" else "Add to Favourite")
         }
 
-        Spacer(modifier = Modifier.height(16.dp)) // Ensure spacing at the bottom
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
-
 
 @Composable
 fun DetailItem(label: String, value: String?) {

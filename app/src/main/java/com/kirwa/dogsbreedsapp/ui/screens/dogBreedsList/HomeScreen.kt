@@ -13,12 +13,15 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.kirwa.dogsbreedsapp.R
@@ -56,30 +59,45 @@ fun DogBreedItem(dog: DogBreed, onClick: () -> Unit) {
     ) {
         Row(modifier = Modifier.padding(16.dp)) {
             val imageUrl = Constants.IMAGES_BASE_URL + "${dog.referenceImageId}.jpg"
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = imageUrl,
-                    placeholder = painterResource(id = R.drawable.baseline_image_search_24),  // Optional: placeholder image while loading
-                    error = painterResource(id = R.drawable.baseline_image_24)  // Optional: error image in case of failure
-                ),
-                contentDescription = dog.name,
-                contentScale = ContentScale.Crop, // Ensures the image is cropped at the center
 
-                modifier = Modifier
-                    .size(height = 60.dp, width = 80.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.White)  // Background color of image
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        model = imageUrl,
+                        placeholder = painterResource(id = R.drawable.baseline_image_search_24),
+                        error = painterResource(id = R.drawable.baseline_image_24)
+                    ),
+                    contentDescription = dog.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(height = 60.dp, width = 80.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.White)
+                )
 
+                if (dog.isFavourite) {
+                    Text(
+                        text = "Favourite",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .background(colorResource(id = R.color.orange), RoundedCornerShape(4.dp))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                }
+            }
 
             Column(modifier = Modifier.padding(start = 8.dp)) {
                 Text(text = dog.name ?: "", style = MaterialTheme.typography.titleLarge)
                 Text(
-                    text = "Breed for: ${dog.bredFor ?: ""}",
+                    text = "Bred for: ${dog.bredFor ?: ""}",
                     style = MaterialTheme.typography.titleMedium
                 )
             }
         }
     }
 }
+
+
 

@@ -14,7 +14,6 @@ class DogBreedDetailViewModel(private val dogBreedsRepository: DogBreedsReposito
     private val _state = MutableStateFlow(DogBreedDetailsUiState())
     val state: StateFlow<DogBreedDetailsUiState> = _state
 
-
     fun getDogBreedById(id:Int) {
         dogBreedsRepository.getDogBreedById(id).onEach { dogBreed ->
             _state.value = state.value.copy(
@@ -23,24 +22,15 @@ class DogBreedDetailViewModel(private val dogBreedsRepository: DogBreedsReposito
         }.launchIn(viewModelScope)
     }
 
-    fun getFavouriteDogBreedById(id:Int) {
-        dogBreedsRepository.getFavouriteDogBreedById(id).onEach { dogBreed ->
-            _state.value = state.value.copy(
-                favouriteDogBreed = dogBreed
-            )
-        }.launchIn(viewModelScope)
-    }
-
-
     fun saveFavouriteDogBreed(dogBreed: FavouriteDogBreed) {
         viewModelScope.launch {
             dogBreedsRepository.saveFavouriteDogBreed(dogBreed)
         }
     }
 
-    fun deleteFavouriteDogBreed(dogBreed: FavouriteDogBreed) {
+    fun deleteFavouriteDogBreed(dogInt: Int) {
         viewModelScope.launch {
-            dogBreedsRepository.deleteFavouriteDogBreed(dogBreed)
+            dogBreedsRepository.deleteFavouriteDogBreed(dogInt)
         }
     }
 }
