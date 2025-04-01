@@ -10,7 +10,7 @@ import com.kirwa.dogsbreedsapp.domain.model.FavouriteDogBreed
 
 @Database(
     entities = [DogBreed::class, FavouriteDogBreed::class],
-    version = 1
+    version = 2
 
 )
 @TypeConverters(Converters::class)

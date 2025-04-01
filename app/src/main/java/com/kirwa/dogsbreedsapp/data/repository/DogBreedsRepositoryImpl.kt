@@ -31,6 +31,7 @@ internal class DogBreedsRepositoryImpl(
 
                     result.body()?.forEach { remoteDogBreed ->
                         remoteDogBreed.apply {
+                            Timber.e("ImageURL ${image?.id}")
                             val dogBreed = id?.let { id ->
                                 DogBreed(
                                     id = id,

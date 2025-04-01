@@ -25,6 +25,7 @@ import com.kirwa.dogsbreedsapp.R
 import com.kirwa.dogsbreedsapp.domain.model.DogBreed
 import com.kirwa.dogsbreedsapp.ui.navigation.NavigationItem
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel.DogBreedsListViewModel
+import com.kirwa.dogsbreedsapp.utils.Constants
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -54,9 +55,10 @@ fun DogBreedItem(dog: DogBreed, onClick: () -> Unit) {
             .background(Color.White)
     ) {
         Row(modifier = Modifier.padding(16.dp)) {
+            val imageUrl = Constants.IMAGES_BASE_URL + "${dog.referenceImageId}.jpg"
             Image(
                 painter = rememberAsyncImagePainter(
-                    model = "https://cdn2.thedogapi.com/images/BJa4kxc4X.jpg",
+                    model = imageUrl,
                     placeholder = painterResource(id = R.drawable.baseline_image_search_24),  // Optional: placeholder image while loading
                     error = painterResource(id = R.drawable.baseline_image_24)  // Optional: error image in case of failure
                 ),
@@ -72,7 +74,10 @@ fun DogBreedItem(dog: DogBreed, onClick: () -> Unit) {
 
             Column(modifier = Modifier.padding(start = 8.dp)) {
                 Text(text = dog.name ?: "", style = MaterialTheme.typography.titleLarge)
-                Text(text = dog.bredFor ?: "", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = "Breed for: ${dog.bredFor ?: ""}",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
         }
     }

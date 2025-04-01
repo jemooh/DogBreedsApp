@@ -9,4 +9,5 @@ object Constants {
     const val HOME = "home"
     const val DETAILS = "details"
     const val FAVOURITES = "favourites"
+    const val IMAGES_BASE_URL = "https://cdn2.thedogapi.com/images/"
 }
