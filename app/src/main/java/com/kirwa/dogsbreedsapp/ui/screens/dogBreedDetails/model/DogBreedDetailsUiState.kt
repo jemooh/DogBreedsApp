@@ -5,6 +5,5 @@ import com.kirwa.dogsbreedsapp.domain.model.FavouriteDogBreed
 
 data class DogBreedDetailsUiState (
     val dog: DogBreed? = null,
-    val favouriteDogBreed: FavouriteDogBreed? = null,
     val isLoading: Boolean = false
 )

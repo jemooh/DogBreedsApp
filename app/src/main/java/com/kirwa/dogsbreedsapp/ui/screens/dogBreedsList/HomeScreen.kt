@@ -37,6 +37,7 @@ import com.kirwa.dogsbreedsapp.domain.model.DogBreed
 import com.kirwa.dogsbreedsapp.ui.navigation.NavigationItem
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel.DogBreedsListViewModel
 import com.kirwa.dogsbreedsapp.utils.Constants
+import com.kirwa.dogsbreedsapp.utils.Util
 import org.koin.androidx.compose.koinViewModel
 /**
  * Composable functions for displaying the Home Screen and Dog Breed Items.
@@ -52,8 +53,6 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(navController: NavController) {
     val context = LocalContext.current
-    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val isConnected = connectivityManager.activeNetworkInfo?.isConnectedOrConnecting == true
 
     val dogBreedsListViewModel: DogBreedsListViewModel = koinViewModel()
 
@@ -61,7 +60,7 @@ fun HomeScreen(navController: NavController) {
     dogBreedsListViewModel.getLocalDogBreeds()
 
     // Fetch remote data only if internet is available
-    if (isConnected) {
+    if (Util.isConnected(context)) {
         dogBreedsListViewModel.fetchRemoteDogBreeds()
     }
 
@@ -80,7 +79,7 @@ fun HomeScreen(navController: NavController) {
                 )
             }
 
-            !isConnected && uiState.dogs.isNotEmpty() -> {
+            !Util.isConnected(context) && uiState.dogs.isNotEmpty() -> {
                 // Small "Offline Mode" banner (Yellow) with Warning Icon
                 Box(
                     modifier = Modifier
@@ -108,7 +107,7 @@ fun HomeScreen(navController: NavController) {
                 }
             }
 
-            !isConnected && uiState.dogs.isEmpty() -> {
+            !Util.isConnected(context) && uiState.dogs.isEmpty() -> {
                 // Large "No Internet & No Data" banner (Red) with No Connection Icon
                 Box(
                     modifier = Modifier

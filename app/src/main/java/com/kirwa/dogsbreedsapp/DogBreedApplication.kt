@@ -1,6 +1,7 @@
 package com.kirwa.dogsbreedsapp
 
 import android.app.Application
+import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import com.kirwa.dogsbreedsapp.di.appModule
 import org.jetbrains.annotations.NotNull
@@ -11,9 +12,12 @@ import org.koin.core.error.KoinAppAlreadyStartedException
 import timber.log.Timber
 
 class DogBreedApplication : Application() {
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+    }
     override fun onCreate() {
         super.onCreate()
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         initTimber()
         initKoin()
     }

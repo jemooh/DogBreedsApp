@@ -43,7 +43,7 @@ class DogBreedsListViewModel(private val dogBreedsListUseCase: DogBreedsListUseC
 
                 is Result.Success -> {
                     _state.value = state.value.copy(
-                        isSuccessRefreshing = true
+                        isErrorRefreshing = false
                     )
                 }
 
