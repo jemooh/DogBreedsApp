@@ -11,6 +11,17 @@ import com.kirwa.dogsbreedsapp.data.remote.model.Result
 import com.kirwa.dogsbreedsapp.domain.usecase.dogBreedsList.DogBreedsListUseCase
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.model.DogBreedsListUiState
 
+/**
+ * ViewModel for managing dog breed list data.
+ *
+ * - Fetches remote and local dog breed data on initialization.
+ * - Handles UI state updates based on API responses.
+ *
+ * Uses:
+ * - `StateFlow` for UI state management.
+ * - `viewModelScope` for coroutine handling.
+ * - `Dispatchers.IO` for network operations.
+ */
 class DogBreedsListViewModel(private val dogBreedsListUseCase: DogBreedsListUseCase) :
     ViewModel() {
     private val _state = MutableStateFlow(DogBreedsListUiState())

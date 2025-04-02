@@ -1,6 +1,7 @@
 package com.kirwa.dogsbreedsapp
 
 import android.app.Application
+import androidx.appcompat.app.AppCompatDelegate
 import com.kirwa.dogsbreedsapp.di.appModule
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
@@ -12,6 +13,7 @@ import timber.log.Timber
 class DogBreedApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         initTimber()
         initKoin()
     }

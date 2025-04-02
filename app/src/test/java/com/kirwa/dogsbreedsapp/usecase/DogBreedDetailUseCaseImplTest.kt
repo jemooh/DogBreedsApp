@@ -17,7 +17,18 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * This is the unit test class to test DogBreedsUseCase using Mockk, Junit, Kotest and Kotlinx.
+ * Unit tests for [DogBreedDetailUseCaseImpl].
+ *
+ * This test class verifies the behavior of the Dog Breed Detail Use Case, ensuring that:
+ * - A specific dog breed can be retrieved by its ID.
+ *
+ * Test cases:
+ * 1. `fetch dog breeds by id` - Ensures that a dog breed is correctly retrieved based on its ID.
+ *
+ * Uses:
+ * - MockK for dependency mocking.
+ * - Kotest assertions for validation.
+ * - kotlinx.coroutines Test API for coroutine-based testing.
  */
 @ExperimentalCoroutinesApi
 class DogBreedDetailUseCaseImplTest {

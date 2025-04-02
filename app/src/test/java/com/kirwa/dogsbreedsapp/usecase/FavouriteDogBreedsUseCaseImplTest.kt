@@ -4,6 +4,7 @@ import com.kirwa.dogsbreedsapp.domain.model.FavouriteDogBreed
 import com.kirwa.dogsbreedsapp.domain.repository.DogBreedsRepository
 import com.kirwa.dogsbreedsapp.domain.usecase.favouriteDogBreeds.FavouriteDogBreedsUseCaseImpl
 import com.kirwa.dogsbreedsapp.utils.CoroutineTestRule
+import com.kirwa.dogsbreedsapp.utils.favouriteDogBreedTest
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.every
@@ -17,7 +18,20 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * This is the unit test class to test FavouriteDogBreedsUseCase using Mockk, Junit, Kotest and Kotlinx.
+ * Unit tests for [FavouriteDogBreedsUseCaseImpl].
+ *
+ * This test class verifies the behavior of the Favourite Dog Breeds Use Case, ensuring that:
+ * - Favorite dog breeds can be retrieved from the local database.
+ * - Dog breeds can be saved as favorites correctly.
+ *
+ * Test cases:
+ * 1. `fetch favourite dog breeds` - Ensures that favorite dog breeds are retrieved correctly.
+ * 2. `Save to favourites` - Ensures that a dog breed can be saved as a favorite.
+ *
+ * Uses:
+ * - MockK for dependency mocking.
+ * - Kotest assertions for validation.
+ * - kotlinx.coroutines Test API for coroutine-based testing.
  */
 @ExperimentalCoroutinesApi
 class FavouriteDogBreedsUseCaseImplTest {
@@ -54,20 +68,7 @@ class FavouriteDogBreedsUseCaseImplTest {
     @Test
     fun `Save to favourites`() = runTest {
         // given
-        val breed = FavouriteDogBreed(
-            id = 5,
-            name = "Akbash Dog",
-            weight = "600",
-            height = "471",
-            bredFor = "Guarding",
-            breedGroup = "Working",
-            temperament = "Loyal, Independent, Intelligent, Brave",
-            origin = "",
-            lifeSpan = "lifeSpan",
-            referenceImageId = "26pHT3Qk7",
-            imageUrl = ""
-        )
-
+        val breed = favouriteDogBreedTest
 
         coEvery {
             dataRepository.saveFavouriteDogBreed(breed)

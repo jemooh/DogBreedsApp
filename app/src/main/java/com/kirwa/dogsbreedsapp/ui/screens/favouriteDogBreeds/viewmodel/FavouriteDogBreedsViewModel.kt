@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 class FavouriteDogBreedsViewModel(private val favouriteDogBreedsUseCase: FavouriteDogBreedsUseCase) :
     ViewModel() {
 
-    private val _state = MutableStateFlow(DogBreedsListUiState())
-    val state: StateFlow<DogBreedsListUiState> = _state
+    private val _state = MutableStateFlow(FavouriteUiState())
+    val state: StateFlow<FavouriteUiState> = _state
 
     init {
         getLocalFavouriteDogBreeds()

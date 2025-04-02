@@ -27,11 +27,10 @@ internal class DogBreedsRepositoryImpl(
                 val limit = 50
                 val page = 1
                 val result = dogsApiService.fetchDogBreeds(limit, page)
-                if (result.isSuccessful) {
 
+                if (result.isSuccessful) {
                     result.body()?.forEach { remoteDogBreed ->
                         remoteDogBreed.apply {
-                            Timber.e("ImageURL ${image?.id}")
                             val dogBreed = id?.let { id ->
                                 DogBreed(
                                     id = id,
@@ -49,19 +48,14 @@ internal class DogBreedsRepositoryImpl(
                             }
                             dogBreed?.let { dogBreedsDao.insertAsync(it) }
                         }
-
                     }
-                    Result.Success(true)
+                    return@withContext Result.Success(true)
                 } else {
-                    Result.Success(false)
-                    Result.Error(Exception(result.errorBody().toString()))
+                    return@withContext Result.Success(false)
                 }
             } catch (e: IOException) {
-                Result.Error(Exception("Error Occurred"))
-                e.printStackTrace()
-                Timber.e(e)
+                return@withContext Result.Error(Exception("Error Occurred"))
             }
-            Result.Success(false)
         }
     }
 
