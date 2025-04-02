@@ -17,6 +17,7 @@ import com.kirwa.dogsbreedsapp.domain.usecase.favouriteDogBreeds.FavouriteDogBre
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedDetails.viewmodel.DogBreedDetailViewModel
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel.DogBreedsListViewModel
 import com.kirwa.dogsbreedsapp.ui.screens.favouriteDogBreeds.viewmodel.FavouriteDogBreedsViewModel
+import com.kirwa.dogsbreedsapp.utils.ConnectivityHelper
 import com.kirwa.dogsbreedsapp.utils.Constants
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -50,16 +51,23 @@ val appModule = module {
         get<DogsDatabase>().favouriteDogBreedsDao
     }
 
+    single {
+        get<DogsDatabase>().remoteKeyDao
+    }
+
+    single { ConnectivityHelper(get()) }
+
     single<DogBreedsRepository> {
         DogBreedsRepositoryImpl(
-            dogsApiService = get(),
+            apiService = get(),
             dogBreedsDao = get(),
+            remoteKeyDao = get(),
             favouriteDogBreedsDao = get()
         )
     }
 
     viewModel {
-        DogBreedsListViewModel(dogBreedsListUseCase = get())
+        DogBreedsListViewModel(useCase = get(), connectivityHelper = get())
     }
 
     viewModel {

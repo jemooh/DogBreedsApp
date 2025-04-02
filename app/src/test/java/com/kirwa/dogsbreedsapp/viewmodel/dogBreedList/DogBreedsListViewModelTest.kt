@@ -1,5 +1,7 @@
 package com.kirwa.dogsbreedsapp.viewmodel.dogBreedList
 
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.PagingData
 import com.kirwa.dogsbreedsapp.domain.usecase.dogBreedsList.DogBreedsListUseCase
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel.DogBreedsListViewModel
 import com.kirwa.dogsbreedsapp.utils.CoroutineTestRule
@@ -9,10 +11,24 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import com.kirwa.dogsbreedsapp.data.remote.model.Result
+import com.kirwa.dogsbreedsapp.domain.model.DogBreed
+import com.kirwa.dogsbreedsapp.domain.model.DogBreedWithFavourite
+import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel.DogBreedsUiState
+import com.kirwa.dogsbreedsapp.utils.ConnectivityHelper
+import com.kirwa.dogsbreedsapp.utils.dogBreedTest
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldContainInOrder
 import kotlinx.coroutines.test.setMain
 import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.*
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -24,82 +40,91 @@ import org.junit.Test
 
 
 @ExperimentalCoroutinesApi
+@ExperimentalPagingApi
 class DogBreedsListViewModelTest {
-
-    @get:Rule
-    val dispatcherRule = CoroutineTestRule()
-
     private lateinit var viewModel: DogBreedsListViewModel
-    private val useCase: DogBreedsListUseCase = mockk(relaxed = true)
+    private val useCase = mockk<DogBreedsListUseCase>()
+    private val connectivityHelper = mockk<ConnectivityHelper>()
+    private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
-        Dispatchers.setMain(StandardTestDispatcher())
-        viewModel = DogBreedsListViewModel(useCase)
+        Dispatchers.setMain(testDispatcher)
+
+        // Default mocks
+        coEvery { useCase.getPagedDogBreeds() } returns flowOf(PagingData.empty())
+        every { connectivityHelper.isConnected() } returns true
+
+        viewModel = DogBreedsListViewModel(useCase, connectivityHelper)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
-    fun `fetchRemoteDogBreeds should return success`() = runTest {
+    fun `initial uiState should have default values`() = runTest(testDispatcher) {
+        viewModel.uiState.value shouldBe DogBreedsUiState(
+            isLoading = false,
+            isNetworkAvailable = true,
+            error = null
+        )
+    }
+
+    @Test
+    fun `dogBreeds flow should update network status`() = runTest(testDispatcher) {
         // Given
-        coEvery { useCase.fetchRemoteDogBreeds() } returns Result.success(true)
+        val testData = PagingData.from(listOf(
+            DogBreedWithFavourite(
+                dogBreed = dogBreedTest,
+                isFavourite = true
+            )
+        ))
+        coEvery { useCase.getPagedDogBreeds() } returns flowOf(testData)
+        every { connectivityHelper.isConnected() } returns false
 
         // When
-        viewModel.fetchRemoteDogBreeds()
+        val collector = TestCollector<PagingData<DogBreedWithFavourite>>()
+        val collectJob = launch { viewModel.dogBreeds.collect(collector) }
+
+        // Execute all pending coroutines
+        advanceUntilIdle()
 
         // Then
-        advanceUntilIdle()
-        viewModel.state.value.isRefreshing shouldBe false
-    }
-   /* @Test
-    fun `fetchRemoteDogBreeds should update state on error`() = runTest {
-        coEvery { useCase.fetchRemoteDogBreeds() } returns Result.Error(Exception("Network Error"))
-
-        viewModel.fetchRemoteDogBreeds()
-
-        viewModel.state.test {
-            awaitItem().isErrorRefreshing shouldBe true
-            awaitItem().errorMessage shouldBe "Network Error"
-        }
+        viewModel.uiState.value.isNetworkAvailable shouldBe false
+        collectJob.cancel()
     }
 
     @Test
-    fun `fetchRemoteDogBreeds should update state on loading`() = runTest {
-        coEvery { useCase.fetchRemoteDogBreeds() } returns Result.Loading
-
-        viewModel.fetchRemoteDogBreeds()
-
-        viewModel.state.test {
-            awaitItem().isRefreshing shouldBe true
-        }
-    }
-
-    @Test
-    fun `getLocalDogBreeds should update state with dog breeds`() = runTest {
+    fun `retry should update loading state`() = runTest(testDispatcher) {
         // Given
-        val dogBreeds = listOf(
-            DogBreed(
-                id = 5,
-                name = "Akbash Dog",
-                weight = "600",
-                height = "471",
-                bredFor = "Guarding",
-                breedGroup = "Working",
-                temperament = "Loyal, Independent, Intelligent, Brave",
-                origin = "",
-                lifeSpan = "lifeSpan",
-                referenceImageId = "26pHT3Qk7",
-                imageUrl = "",
-                isFavourite = false
-            )
+        val testData = PagingData.empty<DogBreedWithFavourite>()
+        coEvery { useCase.getPagedDogBreeds() } returns flowOf(testData)
+
+        // Start collecting states BEFORE triggering the action
+        val states = mutableListOf<DogBreedsUiState>()
+        val stateJob = launch { viewModel.uiState.collect(states::add) }
+
+        // Initial state
+        advanceUntilIdle()
+
+        // When
+        viewModel.retry()
+        advanceUntilIdle()
+
+        // Then
+        states shouldContainInOrder listOf(
+            DogBreedsUiState(isLoading = false), // initial state
+            DogBreedsUiState(isLoading = true),  // retry started
+            DogBreedsUiState(isLoading = false)   // retry completed
         )
 
-        every { useCase.getLocalDogBreeds() } returns flowOf(dogBreeds)
+        stateJob.cancel()
+    }
 
-        // When
-        viewModel.getLocalDogBreeds()
-        advanceUntilIdle() // Ensures all coroutines finish
-
-        // Then
-        viewModel.state.value.dogs shouldBe dogBreeds
-    }*/
+    class TestCollector<T> : FlowCollector<T> {
+        val values = mutableListOf<T>()
+        override suspend fun emit(value: T) { values.add(value) }
+    }
 }

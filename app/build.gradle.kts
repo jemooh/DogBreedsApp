@@ -92,9 +92,16 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
 
+    // Paging library for Compose
+    implementation ("androidx.paging:paging-compose:3.3.6")
+
+    // Paging KTX (for integration with Paging)
+    implementation ("androidx.paging:paging-runtime-ktx:3.3.6")
+
     // Room (Local Database)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    implementation(libs.room.paging)
     ksp(libs.room.compiler)
 
     // Kotlin Coroutines
@@ -108,6 +115,9 @@ dependencies {
     implementation(libs.coil.compose)
 
     implementation(libs.timber)
+
+   /* implementation(libs.pagging.ktx)
+    implementation(libs.pagging.compose)*/
 
     // Testing
     testImplementation(libs.junit)

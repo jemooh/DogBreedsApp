@@ -1,8 +1,14 @@
 package com.kirwa.dogsbreedsapp.data.repository
 
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.kirwa.dogsbreedsapp.data.local.dao.DogBreedsDao
 import com.kirwa.dogsbreedsapp.data.local.dao.FavouriteDogBreedsDao
+import com.kirwa.dogsbreedsapp.data.local.dao.RemoteKeyDao
 import com.kirwa.dogsbreedsapp.data.remote.apiService.DogsApiService
+import com.kirwa.dogsbreedsapp.data.remote.datasource.DogBreedsRemoteMediator
 import com.kirwa.dogsbreedsapp.domain.model.DogBreed
 import com.kirwa.dogsbreedsapp.domain.model.FavouriteDogBreed
 import com.kirwa.dogsbreedsapp.domain.repository.DogBreedsRepository
@@ -12,56 +18,33 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import com.kirwa.dogsbreedsapp.data.remote.model.Result
+import com.kirwa.dogsbreedsapp.domain.model.DogBreedWithFavourite
+import com.kirwa.dogsbreedsapp.utils.ConnectivityHelper
 import timber.log.Timber
 
-internal class DogBreedsRepositoryImpl(
-    private val dogsApiService: DogsApiService,
+class DogBreedsRepositoryImpl(
+    private val apiService: DogsApiService,
     private val dogBreedsDao: DogBreedsDao,
     private val favouriteDogBreedsDao: FavouriteDogBreedsDao,
-    private val isDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val remoteKeyDao: RemoteKeyDao,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : DogBreedsRepository {
-    override suspend fun fetchRemoteDogBreeds(): Result<Boolean> {
-        return withContext(isDispatcher) {
-            try {
-                Result.Loading
-                val limit = 50
-                val page = 1
-                val result = dogsApiService.fetchDogBreeds(limit, page)
 
-                if (result.isSuccessful) {
-                    result.body()?.forEach { remoteDogBreed ->
-                        remoteDogBreed.apply {
-                            val dogBreed = id?.let { id ->
-                                DogBreed(
-                                    id = id,
-                                    name,
-                                    weight = weight?.metric,
-                                    height = height?.metric,
-                                    bredFor = bredFor,
-                                    breedGroup = breedGroup,
-                                    temperament = temperament,
-                                    origin = origin,
-                                    lifeSpan = lifeSpan,
-                                    referenceImageId = referenceImageId,
-                                    imageUrl = image?.url
-                                )
-                            }
-                            dogBreed?.let { dogBreedsDao.insertAsync(it) }
-                        }
-                    }
-                    return@withContext Result.Success(true)
-                } else {
-                    return@withContext Result.Success(false)
-                }
-            } catch (e: IOException) {
-                return@withContext Result.Error(Exception("Error Occurred"))
-            }
-        }
-    }
-
-
-    override fun getLocalDogBreeds(): Flow<List<DogBreed>> {
-        return dogBreedsDao.getDogBreeds()
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getPagedDogBreeds(): Flow<PagingData<DogBreedWithFavourite>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false
+            ),
+            remoteMediator = DogBreedsRemoteMediator(
+                apiService = apiService,
+                dogBreedsDao = dogBreedsDao,
+                remoteKeyDao = remoteKeyDao,
+                ioDispatcher = ioDispatcher
+            ),
+            pagingSourceFactory = { dogBreedsDao.getPagedDogBreeds() }
+        ).flow
     }
 
     override fun getDogBreedById(id: Int): Flow<DogBreed> {

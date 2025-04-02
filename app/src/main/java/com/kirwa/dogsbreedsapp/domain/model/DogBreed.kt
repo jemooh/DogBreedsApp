@@ -20,5 +20,5 @@ data class DogBreed(
     val lifeSpan: String?,
     val referenceImageId: String?,
     val imageUrl: String?,
-    val isFavourite: Boolean = false,
+    val isFavourite: Boolean = false
 )

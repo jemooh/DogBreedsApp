@@ -1,8 +1,17 @@
 package com.kirwa.dogsbreedsapp.repository
 
+import androidx.paging.AsyncPagingDataDiffer
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListUpdateCallback
 import app.cash.turbine.test
 import com.kirwa.dogsbreedsapp.data.local.dao.DogBreedsDao
 import com.kirwa.dogsbreedsapp.data.local.dao.FavouriteDogBreedsDao
+import com.kirwa.dogsbreedsapp.data.local.dao.RemoteKeyDao
 import com.kirwa.dogsbreedsapp.data.remote.apiService.DogsApiService
 import com.kirwa.dogsbreedsapp.data.remote.model.DogBreedsResponse
 import com.kirwa.dogsbreedsapp.data.remote.model.Height
@@ -31,12 +40,24 @@ import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import com.kirwa.dogsbreedsapp.data.remote.model.Result
+import com.kirwa.dogsbreedsapp.domain.model.DogBreedWithFavourite
+import com.kirwa.dogsbreedsapp.domain.model.FavouriteDogBreed
+import com.kirwa.dogsbreedsapp.utils.DogBreedDiffCallback
+import com.kirwa.dogsbreedsapp.utils.NoopListUpdateCallback
+import com.kirwa.dogsbreedsapp.utils.TestPagingSource
 import com.kirwa.dogsbreedsapp.utils.dogBreedTest
 import com.kirwa.dogsbreedsapp.utils.favouriteDogBreedTest
+import io.kotest.matchers.collections.shouldContainExactly
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
+import io.mockk.verify
+import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import okhttp3.ResponseBody.Companion.toResponseBody
 import kotlin.test.DefaultAsserter.fail
 
@@ -64,18 +85,32 @@ import kotlin.test.DefaultAsserter.fail
  * - kotlinx.coroutines Test API for coroutine testing.
  */
 @ExperimentalCoroutinesApi
+@ExperimentalPagingApi
 class DogBreedsRepositoryImplTest {
 
     private lateinit var repository: DogBreedsRepositoryImpl
     private val dogsApiService: DogsApiService = mockk()
     private val dogBreedsDao: DogBreedsDao = mockk(relaxed = true)
     private val favouriteDogBreedsDao: FavouriteDogBreedsDao = mockk(relaxed = true)
+    private val remoteKeyDao: RemoteKeyDao = mockk(relaxed = true)
     private val testDispatcher = StandardTestDispatcher()
+
+    private val dogBreedWithFavouriteTest = DogBreedWithFavourite(
+        dogBreed = dogBreedTest,
+        isFavourite = true
+    )
+
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        repository = DogBreedsRepositoryImpl(dogsApiService, dogBreedsDao, favouriteDogBreedsDao, testDispatcher)
+        repository = DogBreedsRepositoryImpl(
+            dogsApiService,
+            dogBreedsDao,
+            favouriteDogBreedsDao,
+            remoteKeyDao,
+            testDispatcher
+        )
     }
 
     @After
@@ -84,70 +119,88 @@ class DogBreedsRepositoryImplTest {
     }
 
     @Test
-    fun `fetchRemoteDogBreeds should return success when API call is successful`() = runTest {
+    fun `getPagedDogBreeds should return paging data from DAO`() = runTest {
         // Given
-        val mockResponse = listOf(
-            DogBreedsResponse(
-                id = 1, name = "Labrador", weight = Weight("50", "22"),
-                height = Height("24", "60"), breedGroup = "Sporting",
-                lifeSpan = "10-12 years", temperament = "Friendly",
-                referenceImageId = "abc123", image = Image(id = "abc123", url = "https://example.com/image.jpg")
-            )
+        val testData = listOf(dogBreedWithFavouriteTest)
+        val mockPagingSource = mockk<PagingSource<Int, DogBreedWithFavourite>>(relaxed = true)
+
+        coEvery { dogBreedsDao.getPagedDogBreeds() } returns mockPagingSource
+        coEvery { mockPagingSource.load(any()) } returns PagingSource.LoadResult.Page(
+            data = testData,
+            prevKey = null,
+            nextKey = null
         )
-        coEvery { dogsApiService.fetchDogBreeds(any(), any()) } returns Response.success(mockResponse)
 
         // When
-        val result = repository.fetchRemoteDogBreeds()
+        val flow = repository.getPagedDogBreeds()
+        val differ = AsyncPagingDataDiffer(
+            diffCallback = object : DiffUtil.ItemCallback<DogBreedWithFavourite>() {
+                override fun areItemsTheSame(
+                    oldItem: DogBreedWithFavourite,
+                    newItem: DogBreedWithFavourite
+                ) = oldItem.dogBreed.id == newItem.dogBreed.id
 
-        // Then
-        result shouldBe Result.Success(true)
+                override fun areContentsTheSame(
+                    oldItem: DogBreedWithFavourite,
+                    newItem: DogBreedWithFavourite
+                ) = oldItem == newItem
+            },
+            updateCallback = NoopListUpdateCallback(),
+            mainDispatcher = testDispatcher,
+            workerDispatcher = testDispatcher
+        )
 
-        coVerify { dogBreedsDao.insertAsync(any<DogBreed>()) }
-    }
-
-    @Test
-    fun `fetchRemoteDogBreeds should return error when API call fails`() = runTest {
-        // Given
-        coEvery { dogsApiService.fetchDogBreeds(any(), any()) } returns Response.error(500, "Server Error".toResponseBody())
-
-        // When
-        val result = repository.fetchRemoteDogBreeds()
-
-        // Then
-        result shouldBe Result.Success(false)
-    }
-
-    @Test
-    fun `fetchRemoteDogBreeds should return error on network failure`() = runTest {
-        // Given
-        coEvery { dogsApiService.fetchDogBreeds(any(), any()) } throws IOException("Network error")
-
-        // When
-        val result = repository.fetchRemoteDogBreeds()
-
-        // Then
-        when (result) {
-            is Result.Error -> result.exception.message shouldBe "Error Occurred"
-            else -> fail("Expected Result.Error but got $result")
+        val collectJob = launch {
+            flow.collect { pagingData ->
+                differ.submitData(pagingData)
+            }
         }
-    }
 
-
-    @Test
-    fun `getLocalDogBreeds returns data from database`() = runTest {
-        // Given
-        val localBreeds = listOf(dogBreedTest)
-        coEvery { dogBreedsDao.getDogBreeds() } returns flowOf(localBreeds)
-
-        // When
-        val result = repository.getLocalDogBreeds().first()
+        // Wait for data to be loaded
+        advanceUntilIdle()
 
         // Then
-        result shouldBe localBreeds
+        coVerify(exactly = 1) { dogBreedsDao.getPagedDogBreeds() }
+        differ.snapshot().items shouldContainExactly testData
+
+        collectJob.cancel()
+    }
+
+    @OptIn(ExperimentalPagingApi::class)
+    @Test
+    fun `getPagedDogBreeds should call DAO method`() = runTest {
+        // 1. Create a properly mocked PagingSource
+        val mockPagingSource = mockk<PagingSource<Int, DogBreedWithFavourite>>(relaxUnitFun = true) {
+            coEvery { load(any()) } returns PagingSource.LoadResult.Page(
+                data = emptyList(),
+                prevKey = null,
+                nextKey = null
+            )
+        }
+
+        // 2. Setup DAO mock
+        coEvery { dogBreedsDao.getPagedDogBreeds() } returns mockPagingSource
+
+        // 3. Execute and collect
+        val flow = repository.getPagedDogBreeds()
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {
+            flow.collect {
+                // Just collect to trigger execution
+            }
+        }
+
+        // 4. Let coroutines execute
+        advanceUntilIdle()
+
+        // 5. Verify
+        coVerify(exactly = 1) { dogBreedsDao.getPagedDogBreeds() }
+
+        // 6. Clean up
+        collectJob.cancel()
     }
 
     @Test
-    fun `getDogBreedById should return correct dog breed`() = runTest {
+    fun `getDogBreedById should return flow from DAO`() = runTest {
         // Given
         every { dogBreedsDao.getDogBreedById(1) } returns flowOf(dogBreedTest)
 
@@ -159,12 +212,12 @@ class DogBreedsRepositoryImplTest {
             awaitItem() shouldBe dogBreedTest
             cancelAndConsumeRemainingEvents()
         }
+        verify { dogBreedsDao.getDogBreedById(1) }
     }
 
     @Test
-    fun `deleteFavouriteDogBreed should call DAO method`() = runTest {
+    fun `deleteFavouriteDogBreed should call DAO delete method`() = runTest {
         // Given
-
         coEvery { favouriteDogBreedsDao.deleteFavouriteDogBreedById(1) } just Runs
 
         // When
@@ -175,7 +228,7 @@ class DogBreedsRepositoryImplTest {
     }
 
     @Test
-    fun `getLocalFavouriteDogBreeds should return list of favourite breeds`() = runTest {
+    fun `getLocalFavouriteDogBreeds should return flow from DAO`() = runTest {
         // Given
         val favBreeds = listOf(favouriteDogBreedTest)
         every { favouriteDogBreedsDao.getFavouriteDogBreeds() } returns flowOf(favBreeds)
@@ -188,12 +241,12 @@ class DogBreedsRepositoryImplTest {
             awaitItem() shouldBe favBreeds
             cancelAndConsumeRemainingEvents()
         }
+        verify { favouriteDogBreedsDao.getFavouriteDogBreeds() }
     }
 
     @Test
-    fun `saveFavouriteDogBreed should insert favourite breed`() = runTest {
+    fun `saveFavouriteDogBreed should call DAO insert method`() = runTest {
         // Given
-        val favouriteDogBreedTest = favouriteDogBreedTest
         coEvery { favouriteDogBreedsDao.insertAsync(favouriteDogBreedTest) } just Runs
 
         // When
@@ -203,3 +256,4 @@ class DogBreedsRepositoryImplTest {
         coVerify(exactly = 1) { favouriteDogBreedsDao.insertAsync(favouriteDogBreedTest) }
     }
 }
+
