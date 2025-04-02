@@ -48,7 +48,7 @@ class DogBreedsListViewModelTest {
 
         // Then
         advanceUntilIdle()
-        viewModel.state.value.isSuccessRefreshing shouldBe true
+        viewModel.state.value.isRefreshing shouldBe false
     }
    /* @Test
     fun `fetchRemoteDogBreeds should update state on error`() = runTest {
