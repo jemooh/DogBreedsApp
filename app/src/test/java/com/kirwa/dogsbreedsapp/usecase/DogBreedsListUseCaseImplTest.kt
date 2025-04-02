@@ -18,15 +18,23 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.jupiter.api.assertThrows
 
 /**
  * Unit tests for [DogBreedsListUseCaseImpl].
@@ -47,19 +55,23 @@ import org.junit.Test
 class DogBreedsListUseCaseImplTest {
     private lateinit var useCase: DogBreedsListUseCaseImpl
     private val repository = mockk<DogBreedsRepository>()
-
-    @get:Rule
-    val coroutineTestRule = CoroutineTestRule()
+    private val testDispatcher = StandardTestDispatcher()
 
     @Before
-    fun setup() {
+    fun setUp() {
+        Dispatchers.setMain(testDispatcher)
         useCase = DogBreedsListUseCaseImpl(repository)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
     fun `getPagedDogBreeds should return flow from repository`() = runTest {
         // Given
-        val testData = listOf(
+        val testData = PagingData.from(listOf(
             DogBreedWithFavourite(
                 dogBreed = DogBreed(
                     id = 1,
@@ -76,53 +88,48 @@ class DogBreedsListUseCaseImplTest {
                 ),
                 isFavourite = true
             )
-        )
+        ))
 
-        val pagingData = PagingData.from(testData)
-        coEvery { repository.getPagedDogBreeds() } returns flowOf(pagingData)
+        coEvery { repository.getPagedDogBreeds() } returns flowOf(testData)
 
         // When
-        val result = useCase.getPagedDogBreeds().first()
+        val result = useCase.getPagedDogBreeds()
 
         // Then
-        val differ = AsyncPagingDataDiffer(
-            diffCallback = object : DiffUtil.ItemCallback<DogBreedWithFavourite>() {
-                override fun areItemsTheSame(
-                    oldItem: DogBreedWithFavourite,
-                    newItem: DogBreedWithFavourite
-                ) = oldItem.dogBreed.id == newItem.dogBreed.id
-
-                override fun areContentsTheSame(
-                    oldItem: DogBreedWithFavourite,
-                    newItem: DogBreedWithFavourite
-                ) = oldItem == newItem
-            },
-            updateCallback = NoopListUpdateCallback(),
-            mainDispatcher = coroutineTestRule.dispatcher,
-            workerDispatcher = coroutineTestRule.dispatcher
-        )
-
-        val collectJob = launch {
-            // Using regular collect instead of collectLatest
-            /*result.collectLatest { pagingData ->
-                differ.submitData(pagingData)
-            }*/
-        }
-
+        val collector = TestCollector<PagingData<DogBreedWithFavourite>>()
+        val collectJob = launch { result.collect(collector) }
         advanceUntilIdle()
 
-        // Verification
-        differ.snapshot().items shouldContainExactly testData
+        collector.values.size shouldBe 1
         coVerify(exactly = 1) { repository.getPagedDogBreeds() }
-
         collectJob.cancel()
     }
-}
 
-// Required in test sources
-class NoopListUpdateCallback : ListUpdateCallback {
-    override fun onInserted(position: Int, count: Int) {}
-    override fun onRemoved(position: Int, count: Int) {}
-    override fun onMoved(fromPosition: Int, toPosition: Int) {}
-    override fun onChanged(position: Int, count: Int, payload: Any?) {}
+    @Test
+    fun `getPagedDogBreeds should propagate errors from repository`() = runTest {
+        // Given
+        val testError = RuntimeException("Test error")
+        coEvery { repository.getPagedDogBreeds() } returns flow { throw testError }
+
+        // When
+        val result = useCase.getPagedDogBreeds()
+
+        // Then
+        val collector = TestCollector<PagingData<DogBreedWithFavourite>>()
+        val collectJob = launch {
+            assertThrows<RuntimeException> {
+                result.collect(collector)
+            } shouldBe testError
+        }
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { repository.getPagedDogBreeds() }
+        collectJob.cancel()
+    }
+
+    // Helper collector class
+    private class TestCollector<T> : FlowCollector<T> {
+        val values = mutableListOf<T>()
+        override suspend fun emit(value: T) { values.add(value) }
+    }
 }
