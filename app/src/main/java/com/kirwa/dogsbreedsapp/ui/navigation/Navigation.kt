@@ -7,6 +7,13 @@ import androidx.navigation.compose.composable
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedDetails.DogBreedDetailsScreen
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.HomeScreen
 import com.kirwa.dogsbreedsapp.ui.screens.favouriteDogBreeds.FavouriteScreen
+/**
+ * Sets up navigation for the app using a NavHost.
+ *
+ * - Defines the start destination as the Home screen.
+ * - Provides navigation to the Home, Favourites, and Dog Breed Details screens.
+ * - Passes necessary arguments to the DogBreedDetailsScreen.
+ */
 
 @Composable
 fun Navigation(navController: NavHostController) {

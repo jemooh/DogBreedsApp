@@ -1,6 +1,5 @@
 package com.kirwa.dogsbreedsapp.di
 
-//import com.tech.dvtweatherapp.BuildConfig
 import com.kirwa.dogsbreedsapp.BuildConfig
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -10,7 +9,16 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 /**
- * createNetworkClient
+ * Network client configuration utilities including:
+ *
+ * 1. Retrofit client setup with base configuration
+ * 2. OkHttp client with:
+ *    - API key authentication
+ *    - Debug logging
+ *    - Timeout settings
+ * 3. Request/response interceptors
+ *
+ * Used to create the [DogsApiService] instance.
  */
 fun createNetworkClient(
     baseUrl: String,

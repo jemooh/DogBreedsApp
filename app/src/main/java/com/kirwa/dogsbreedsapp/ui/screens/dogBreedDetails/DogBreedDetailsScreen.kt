@@ -44,7 +44,22 @@ import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel.DogBreedsListV
 import com.kirwa.dogsbreedsapp.ui.screens.favouriteDogBreeds.viewmodel.FavouriteDogBreedsViewModel
 import com.kirwa.dogsbreedsapp.utils.Constants
 import org.koin.androidx.compose.koinViewModel
-
+/**
+ * Composable screen that displays detailed information about a dog breed including:
+ *
+ * 1. Breed image and basic details
+ * 2. Characteristics (weight, height, temperament etc.)
+ * 3. Favorite status toggle
+ * 4. Navigation back button
+ *
+ * State Management:
+ * - Uses [DogBreedDetailViewModel] for breed data
+ * - Uses [FavouriteDogBreedsViewModel] for favorite operations
+ * - Maintains local UI state for scroll position and favorite toggle
+ *
+ * @param dogId The ID of the dog breed to display
+ * @param navController For handling back navigation
+ */
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun DogBreedDetailsScreen(dogId: String, navController: NavController) {

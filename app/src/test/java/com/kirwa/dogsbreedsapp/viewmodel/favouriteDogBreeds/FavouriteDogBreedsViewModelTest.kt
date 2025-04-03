@@ -21,21 +21,16 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Unit tests for [FavouriteDogBreedsViewModel].
+ * Unit tests for [FavouriteDogBreedsViewModel] verifying:
  *
- * This test class verifies the behavior of the Favourite Dog Breeds ViewModel, ensuring that:
- * - The ViewModel correctly fetches the list of favorite dog breeds.
- * - The state updates correctly when there are favorite dog breeds.
- * - The state updates correctly when there are no favorite dog breeds.
+ * 1. Initial loading of favorite dog breeds
+ * 2. Empty state handling
+ * 3. Proper state transitions
+ * 4. Data flow from [FavouriteDogBreedsUseCaseImpl]
  *
- * Test cases:
- * 1. `initialize then fetch favourite dog breeds successfully` - Ensures that the ViewModel correctly retrieves and updates state when there are favorite dog breeds.
- * 2. `initialize then fetch favourite dog breeds which has no items` - Ensures that the ViewModel correctly updates state when no favorite dog breeds are available.
- *
- * Uses:
- * - MockK for dependency mocking.
- * - Kotest assertions for validation.
- * - kotlinx.coroutines Test API for coroutine-based testing.
+ * Tests both successful data loading and empty state scenarios
+ * with mocked use case dependencies. Uses coroutine test rules
+ * for reliable async operation testing.
  */
 @ExperimentalCoroutinesApi
 class FavouriteDogBreedsViewModelTest {

@@ -37,18 +37,15 @@ import org.junit.Test
 import org.junit.jupiter.api.assertThrows
 
 /**
- * Unit tests for [DogBreedsListUseCaseImpl].
+ * Unit tests for [DogBreedsListUseCaseImpl] verifying:
  *
- * This test class verifies the behavior of the Dog Breeds List Use Case, ensuring that:
- * - The list of dog breeds is correctly retrieved from the local database.
+ * 1. Paged dog breeds data flow from repository
+ * 2. Proper pagination handling
+ * 3. Error propagation from repository
+ * 4. Coroutine safety
  *
- * Test cases:
- * 1. `fetch dog breeds` - Ensures that a list of dog breeds is retrieved correctly.
- *
- * Uses:
- * - MockK for dependency mocking.
- * - Kotest assertions for validation.
- * - kotlinx.coroutines Test API for coroutine-based testing.
+ * Tests both successful data flow and error scenarios using
+ * [StandardTestDispatcher] for precise coroutine control.
  */
 @ExperimentalCoroutinesApi
 @ExperimentalPagingApi

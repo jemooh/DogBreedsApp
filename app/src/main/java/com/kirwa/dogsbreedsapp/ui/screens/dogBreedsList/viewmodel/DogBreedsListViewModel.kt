@@ -20,15 +20,11 @@ import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.model.DogBreedsListUiSta
 import com.kirwa.dogsbreedsapp.utils.ConnectivityHelper
 
 /**
- * ViewModel for managing dog breed list data.
+ * ViewModel for managing the list of dog breeds with pagination.
  *
- * - Fetches remote and local dog breed data on initialization.
- * - Handles UI state updates based on API responses.
- *
- * Uses:
- * - `StateFlow` for UI state management.
- * - `viewModelScope` for coroutine handling.
- * - `Dispatchers.IO` for network operations.
+ * - Uses Paging 3 to fetch dog breeds efficiently.
+ * - Observes network connectivity and updates UI state accordingly.
+ * - Provides a retry function to refresh the list in case of failure.
  */
 class DogBreedsListViewModel(
     private val useCase: DogBreedsListUseCase,

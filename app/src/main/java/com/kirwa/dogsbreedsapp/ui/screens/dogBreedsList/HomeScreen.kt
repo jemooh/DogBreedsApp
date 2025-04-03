@@ -55,6 +55,7 @@ import com.kirwa.dogsbreedsapp.utils.Constants
  * - Jetpack Compose for UI.
  * - Koin for dependency injection.
  * - Coil for image loading.
+ * -  Lazy-loaded items with navigation support
  */
 @Composable
 fun HomeScreen(

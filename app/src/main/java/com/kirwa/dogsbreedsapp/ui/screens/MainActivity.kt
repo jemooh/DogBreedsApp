@@ -16,6 +16,13 @@ import com.kirwa.dogsbreedsapp.ui.screens.MainScreen
 import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel.DogBreedsListViewModel
 import com.kirwa.dogsbreedsapp.ui.theme.DogsBreedsAppTheme
 import org.koin.androidx.compose.koinViewModel
+/**
+ * Main entry point of the application.
+ *
+ * - Extends ComponentActivity.
+ * - Sets up the app theme and UI.
+ * - Hosts the MainScreen composable.
+ */
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -2,49 +2,29 @@ package com.kirwa.dogsbreedsapp.repository
 
 import androidx.paging.AsyncPagingDataDiffer
 import androidx.paging.ExperimentalPagingApi
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
-import androidx.paging.PagingState
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListUpdateCallback
 import app.cash.turbine.test
 import com.kirwa.dogsbreedsapp.data.local.dao.DogBreedsDao
 import com.kirwa.dogsbreedsapp.data.local.dao.FavouriteDogBreedsDao
 import com.kirwa.dogsbreedsapp.data.local.dao.RemoteKeyDao
 import com.kirwa.dogsbreedsapp.data.remote.apiService.DogsApiService
-import com.kirwa.dogsbreedsapp.data.remote.model.DogBreedsResponse
-import com.kirwa.dogsbreedsapp.data.remote.model.Height
-import com.kirwa.dogsbreedsapp.data.remote.model.Image
-import com.kirwa.dogsbreedsapp.data.remote.model.Weight
 import com.kirwa.dogsbreedsapp.data.repository.DogBreedsRepositoryImpl
-import com.kirwa.dogsbreedsapp.domain.model.DogBreed
-import io.kotest.core.test.TestStatus
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.slot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import okhttp3.ResponseBody
-import okio.IOException
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import retrofit2.Response
-import com.kirwa.dogsbreedsapp.data.remote.model.Result
 import com.kirwa.dogsbreedsapp.domain.model.DogBreedWithFavourite
-import com.kirwa.dogsbreedsapp.domain.model.FavouriteDogBreed
-import com.kirwa.dogsbreedsapp.utils.DogBreedDiffCallback
 import com.kirwa.dogsbreedsapp.utils.NoopListUpdateCallback
-import com.kirwa.dogsbreedsapp.utils.TestPagingSource
 import com.kirwa.dogsbreedsapp.utils.dogBreedTest
 import com.kirwa.dogsbreedsapp.utils.favouriteDogBreedTest
 import io.kotest.matchers.collections.shouldContainExactly
@@ -52,37 +32,25 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.verify
-import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import okhttp3.ResponseBody.Companion.toResponseBody
-import kotlin.test.DefaultAsserter.fail
 
 /**
- * Unit tests for [DogBreedsRepositoryImpl].
+ * Unit tests for [DogBreedsRepositoryImpl] verifying:
  *
- * This test class verifies the behavior of the repository methods by mocking the dependencies,
- * ensuring that:
- * - Remote data is fetched correctly from the API.
- * - Data is stored and retrieved correctly from the local database.
- * - Errors and exceptions are handled properly.
- * - DAO interactions are verified.
+ * 1. Paged dog breeds data flow from local DAO
+ * 2. Single dog breed retrieval
+ * 3. Favorites management operations:
+ *    - Saving favorites
+ *    - Deleting favorites
+ *    - Retrieving favorites list
  *
- * Test cases:
- * 1. `fetchRemoteDogBreeds` - Ensures successful API response and error handling.
- * 2. `getLocalDogBreeds` - Ensures local breeds are retrieved correctly.
- * 3. `getDogBreedById` - Ensures a single breed is fetched correctly by ID.
- * 4. `deleteFavouriteDogBreed` - Ensures deletion of a favorite dog breed.
- * 5. `getLocalFavouriteDogBreeds` - Ensures retrieval of favorite dog breeds.
- * 6. `saveFavouriteDogBreed` - Ensures insertion of a favorite dog breed.
+ * Uses MockK for mocking dependencies and TestCoroutineDispatcher for coroutine testing.
+ * Tests cover both success scenarios and proper delegation to underlying DAOs.
  *
- * Uses:
- * - MockK for mocking dependencies.
- * - Kotest assertions for validation.
- * - kotlinx.coroutines Test API for coroutine testing.
+ * @see DogBreedsRepositoryImpl
  */
 @ExperimentalCoroutinesApi
 @ExperimentalPagingApi

@@ -25,6 +25,14 @@ import com.kirwa.dogsbreedsapp.R
 import com.kirwa.dogsbreedsapp.ui.component.BottomNavBar
 import com.kirwa.dogsbreedsapp.ui.navigation.Navigation
 import com.kirwa.dogsbreedsapp.ui.navigation.NavigationItem
+/**
+ * Composable function for the main screen of the app.
+ *
+ * - Manages navigation using NavController.
+ * - Displays a top app bar with the app title.
+ * - Shows a bottom navigation bar for top-level destinations.
+ * - Hosts the navigation graph for different screens.
+ */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

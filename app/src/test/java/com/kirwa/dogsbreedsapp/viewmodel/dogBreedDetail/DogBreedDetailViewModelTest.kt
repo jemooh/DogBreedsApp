@@ -16,19 +16,14 @@ import kotlin.test.Test
 
 
 /**
- * Unit tests for [DogBreedDetailViewModel].
+ * Unit tests for [DogBreedDetailViewModel] verifying:
  *
- * This test class verifies the behavior of the Dog Breed Detail ViewModel, ensuring that:
- * - The ViewModel correctly fetches a specific dog breed by its ID.
- * - The state updates correctly when the dog breed is retrieved successfully.
+ * 1. Successful loading of dog breed details by ID
+ * 2. Proper state updates when receiving breed data
+ * 3. Correct interaction with [DogBreedDetailUseCase]
  *
- * Test cases:
- * 1. `getDogBreedById should update state with dog breed` - Ensures that the ViewModel correctly updates its state with the fetched dog breed.
- *
- * Uses:
- * - MockK for dependency mocking.
- * - Kotest assertions for validation.
- * - kotlinx.coroutines Test API for coroutine-based testing.
+ * Uses MockK for use case mocking and TestCoroutineDispatcher
+ * for predictable coroutine execution.
  */
 @ExperimentalCoroutinesApi
 class DogBreedDetailViewModelTest {

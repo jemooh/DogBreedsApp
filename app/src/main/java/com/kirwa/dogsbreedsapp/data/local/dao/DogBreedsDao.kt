@@ -5,7 +5,20 @@ import androidx.room.*
 import com.kirwa.dogsbreedsapp.domain.model.DogBreed
 import com.kirwa.dogsbreedsapp.domain.model.DogBreedWithFavourite
 import kotlinx.coroutines.flow.Flow
-
+/**
+ * Data Access Object for dog breed operations providing:
+ *
+ * 1. Paginated breed data with favorite status ([getPagedDogBreeds])
+ *   - Combines [DogBreed] with [FavouriteDogBreed] via SQL JOIN
+ *   - Returns [PagingSource] for efficient pagination
+ *   - Orders results alphabetically by name
+ *
+ * 2. Individual breed lookup with favorite status ([getDogBreedById])
+ *   - Uses LEFT JOIN to determine favorite status
+ *   - Returns [Flow] for reactive updates
+ *
+ * Inherits common CRUD operations from [CoroutineBaseDao]
+ */
 @Dao
 interface DogBreedsDao : CoroutineBaseDao<DogBreed> {
     @Query("""

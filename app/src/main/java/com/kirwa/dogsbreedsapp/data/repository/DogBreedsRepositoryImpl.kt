@@ -22,6 +22,20 @@ import com.kirwa.dogsbreedsapp.domain.model.DogBreedWithFavourite
 import com.kirwa.dogsbreedsapp.utils.ConnectivityHelper
 import timber.log.Timber
 
+/**
+ * Implementation of [DogBreedsRepository] that handles:
+ *
+ * 1. Paginated dog breeds data with remote and local caching
+ * 2. Favorite dog breeds management
+ * 3. Breed detail fetching
+ *
+ * Uses [DogBreedsRemoteMediator] for coordinated network/database paging
+ * and maintains data consistency across multiple data sources:
+ * - [DogsApiService] for remote data
+ * - [DogBreedsDao] for local cache
+ * - [FavouriteDogBreedsDao] for favorites storage
+ * - [RemoteKeyDao] for pagination metadata
+ */
 class DogBreedsRepositoryImpl(
     private val apiService: DogsApiService,
     private val dogBreedsDao: DogBreedsDao,

@@ -24,7 +24,25 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
-
+/**
+ * Koin dependency injection module providing:
+ *
+ * 1. Network components:
+ *    - Retrofit API service
+ *    - Network client configuration
+ *
+ * 2. Database components:
+ *    - Room database instance
+ *    - DAO accessors
+ *
+ * 3. Application components:
+ *    - Repository implementations
+ *    - Use cases
+ *    - ViewModels
+ *    - SharedPreferences
+ *
+ * Configures all application dependencies with proper scoping.
+ */
 const val baseUrl: String = Constants.BASE_URL
 const val apiKey: String = Constants.APIKEY
 

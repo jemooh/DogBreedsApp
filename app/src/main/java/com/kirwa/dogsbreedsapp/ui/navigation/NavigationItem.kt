@@ -9,7 +9,14 @@ import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.kirwa.dogsbreedsapp.R
 import java.util.ResourceBundle
-
+/**
+ * Defines navigation destinations in the app using a sealed class.
+ *
+ * - Each destination has a route, title resource ID, and optional icon.
+ * - `Home` represents the home screen.
+ * - `Favourites` represents the favorites screen.
+ * - `DogBreedDetails` is a dynamic route that accepts a dog ID as a parameter.
+ */
 sealed class NavigationItem(
     val route: String,
     @StringRes val title: Int?,

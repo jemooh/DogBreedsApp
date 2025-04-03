@@ -18,6 +18,22 @@ import com.kirwa.dogsbreedsapp.data.local.dao.RemoteKeyDao
 import com.kirwa.dogsbreedsapp.domain.model.DogBreedWithFavourite
 import com.kirwa.dogsbreedsapp.domain.model.RemoteKey
 
+/**
+ * [RemoteMediator] implementation that coordinates:
+ *
+ * 1. Network pagination with the Dogs API
+ * 2. Local caching in Room database
+ * 3. Pagination state management
+ *
+ * Handles all paging operations including:
+ * - Initial load (REFRESH)
+ * - Page appending (APPEND)
+ * - Error states and retries
+ * - Conversion between API models and database entities
+ *
+ * Works with [DogBreedWithFavourite] models to maintain
+ * both breed data and favorite status.
+ */
 @OptIn(ExperimentalPagingApi::class)
 class DogBreedsRemoteMediator(
     private val apiService: DogsApiService,

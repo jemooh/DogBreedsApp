@@ -16,19 +16,6 @@ constructor(private val settings: SharedPreferences) {
         return prevShouldShowStatus != currShouldShowStatus
     }
 
-    fun setShouldShowStatus(
-        context: Context,
-        permission: String?
-    ) {
-        val genPrefs = context.getSharedPreferences(
-            "GENERIC_PREFERENCES",
-            Context.MODE_PRIVATE
-        )
-        val editor = genPrefs.edit()
-        editor.putBoolean(permission, true)
-        editor.apply()
-    }
-
     private fun getRatinaleDisplayStatus(
         context: Context,
         permission: String?

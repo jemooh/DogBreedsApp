@@ -18,20 +18,14 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * Unit tests for [FavouriteDogBreedsUseCaseImpl].
+ * Unit tests for [FavouriteDogBreedsUseCaseImpl] verifying:
  *
- * This test class verifies the behavior of the Favourite Dog Breeds Use Case, ensuring that:
- * - Favorite dog breeds can be retrieved from the local database.
- * - Dog breeds can be saved as favorites correctly.
+ * 1. Retrieval of favorite dog breeds list
+ * 2. Saving breeds to favorites
+ * 3. Proper repository interaction
  *
- * Test cases:
- * 1. `fetch favourite dog breeds` - Ensures that favorite dog breeds are retrieved correctly.
- * 2. `Save to favourites` - Ensures that a dog breed can be saved as a favorite.
- *
- * Uses:
- * - MockK for dependency mocking.
- * - Kotest assertions for validation.
- * - kotlinx.coroutines Test API for coroutine-based testing.
+ * Validates both data retrieval and mutation operations
+ * with mocked repository dependencies.
  */
 @ExperimentalCoroutinesApi
 class FavouriteDogBreedsUseCaseImplTest {

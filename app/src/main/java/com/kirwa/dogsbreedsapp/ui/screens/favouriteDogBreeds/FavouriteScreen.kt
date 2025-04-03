@@ -37,7 +37,15 @@ import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.viewmodel.DogBreedsListV
 import com.kirwa.dogsbreedsapp.ui.screens.favouriteDogBreeds.viewmodel.FavouriteDogBreedsViewModel
 import com.kirwa.dogsbreedsapp.utils.Constants
 import org.koin.androidx.compose.koinViewModel
-
+/**
+ * FavouriteScreen displays a list of favourite dog breeds stored locally.
+ * If there are no favourite breeds, it shows an empty state screen.
+ *
+ * - Uses Koin for dependency injection to retrieve the ViewModel.
+ * - Observes state changes using collectAsState.
+ * - Displays a list of favourite dog breeds using LazyColumn.
+ * - Navigates to the dog breed details screen on item click.
+ */
 @Composable
 fun FavouriteScreen(navController: NavController) {
     val dogBreedsListViewModel: FavouriteDogBreedsViewModel = koinViewModel()

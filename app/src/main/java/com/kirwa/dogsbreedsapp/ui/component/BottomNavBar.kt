@@ -14,6 +14,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kirwa.dogsbreedsapp.ui.navigation.NavigationItem
+/**
+ * A composable function that represents the bottom navigation bar of the app.
+ *
+ * - Displays a list of navigation items with icons and labels.
+ * - Highlights the selected item based on the current destination.
+ * - Navigates to the corresponding screen when an item is clicked.
+ *
+ * @param modifier Modifier to be applied to the NavigationBar.
+ * @param navHostController NavController used for navigation.
+ * @param bottomNavItems A list of NavigationItem to be displayed in the bottom bar.
+ */
 
 @Composable
 fun BottomNavBar(

@@ -34,7 +34,18 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * This is the test class to test DogBreedsListViewModel using Mockk, Junit, Kotest and Kotlinx.
+ * Unit tests for [DogBreedsListViewModel] verifying:
+ *
+ * 1. Initial state setup
+ * 2. Paged dog breeds data flow
+ * 3. Network connectivity status updates
+ * 4. Retry mechanism behavior
+ * 5. Loading state transitions
+ *
+ * Tests both UI state management and data flow using
+ * [StandardTestDispatcher] for precise coroutine control.
+ * Validates integration with [DogBreedsListUseCase] and
+ * [ConnectivityHelper] dependencies.
  */
 
 

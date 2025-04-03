@@ -12,6 +12,13 @@ import com.kirwa.dogsbreedsapp.ui.screens.dogBreedsList.model.DogBreedsListUiSta
 import com.kirwa.dogsbreedsapp.ui.screens.favouriteDogBreeds.model.FavouriteUiState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+/**
+ * ViewModel for managing favourite dog breeds.
+ *
+ * - Fetches locally stored favourite dog breeds on initialization.
+ * - Uses StateFlow to expose UI state.
+ * - Provides functions to save and delete favourite dog breeds.
+ */
 
 class FavouriteDogBreedsViewModel(private val favouriteDogBreedsUseCase: FavouriteDogBreedsUseCase) :
     ViewModel() {
