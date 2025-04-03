@@ -73,9 +73,9 @@ I have used the dependencies which are part of [Jetpack](https://developer.andro
 
 ### Dog Breeds app screenshots
 
-| <img src="Homelistscreen.jpg" height="480">
-|| <img src="Favouritescreen.jpg" height="480">
-|| <img src="Detailview.jpg" height="480">
+| <img src="Homelistscreen.jpeg" height="480">
+|| <img src="Favouritescreen.jpeg" height="480">
+|| <img src="Detailview.jpeg" height="480">
 
 
 
