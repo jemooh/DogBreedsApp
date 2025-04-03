@@ -47,9 +47,6 @@ import org.junit.Test
  * Validates integration with [DogBreedsListUseCase] and
  * [ConnectivityHelper] dependencies.
  */
-
-
-
 @ExperimentalCoroutinesApi
 @ExperimentalPagingApi
 class DogBreedsListViewModelTest {

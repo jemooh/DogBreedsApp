@@ -3,10 +3,12 @@ package com.kirwa.dogsbreedsapp.viewmodel.favouriteDogBreeds
 import com.kirwa.dogsbreedsapp.domain.model.FavouriteDogBreed
 import com.kirwa.dogsbreedsapp.domain.usecase.favouriteDogBreeds.FavouriteDogBreedsUseCase
 import com.kirwa.dogsbreedsapp.domain.usecase.favouriteDogBreeds.FavouriteDogBreedsUseCaseImpl
+import com.kirwa.dogsbreedsapp.ui.screens.favouriteDogBreeds.model.FavouriteUiState
 import com.kirwa.dogsbreedsapp.ui.screens.favouriteDogBreeds.viewmodel.FavouriteDogBreedsViewModel
 import com.kirwa.dogsbreedsapp.utils.CoroutineTestRule
 import com.kirwa.dogsbreedsapp.utils.favouriteDogBreedTest
 import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,7 +38,6 @@ import org.junit.Test
 class FavouriteDogBreedsViewModelTest {
 
     private lateinit var viewModel: FavouriteDogBreedsViewModel
-
     private val favouriteDogBreedsUseCase = mockk<FavouriteDogBreedsUseCaseImpl>()
 
     @get:Rule
@@ -44,7 +45,8 @@ class FavouriteDogBreedsViewModelTest {
 
     @Before
     fun setUp() {
-        // Initialize the viewModel before each test
+        // Setup default mock behavior before ViewModel initialization
+        coEvery { favouriteDogBreedsUseCase.getLocalFavouriteDogBreeds() } returns flowOf(emptyList())
         viewModel = FavouriteDogBreedsViewModel(favouriteDogBreedsUseCase)
     }
 
@@ -52,38 +54,33 @@ class FavouriteDogBreedsViewModelTest {
     fun `initialize then fetch favourite dog breeds successfully`() = runTest {
         // Given
         val favouriteDogBreed = favouriteDogBreedTest
+        val testData = listOf(favouriteDogBreed, favouriteDogBreed)
 
-        every { favouriteDogBreedsUseCase.getLocalFavouriteDogBreeds() } returns flowOf(listOf(favouriteDogBreed, favouriteDogBreed))
+        // Override default mock for this specific test
+        coEvery { favouriteDogBreedsUseCase.getLocalFavouriteDogBreeds() } returns flowOf(testData)
 
-        // When
+        // When - Reinitialize to trigger the new mock behavior
         viewModel = FavouriteDogBreedsViewModel(favouriteDogBreedsUseCase)
-
-        runCurrent()
+        advanceUntilIdle()  // Process coroutines
 
         // Then
-        val state = viewModel.state.first()
-        state.favouriteDogBreeds.size shouldBe 2
-        state.isLoading shouldBe false
+        viewModel.state.value shouldBe FavouriteUiState(
+            favouriteDogBreeds = testData,
+            isLoading = false
+        )
     }
 
-
     @Test
-    fun `initialize then fetch favourite dog breeds which has no items`() = runTest {
-        // given
-        every { favouriteDogBreedsUseCase.getLocalFavouriteDogBreeds() } returns flow {
-            emit(emptyList())
-        }
+    fun `initialize then fetch empty favourite dog breeds`() = runTest {
+        // Given - Default mock already returns empty list
 
-        // when
-        // Triggering fetch for local favourite dog breeds
-        viewModel = FavouriteDogBreedsViewModel(favouriteDogBreedsUseCase)
+        // When
+        advanceUntilIdle()  // Process coroutines
 
-        // Collect state to ensure test waits for the result
-        // then
-        // then - Collect only the first emitted value
-        val state = viewModel.state.first()
-        state.favouriteDogBreeds.size shouldBe 0
-        state.isLoading shouldBe false
-
+        // Then
+        viewModel.state.value shouldBe FavouriteUiState(
+            favouriteDogBreeds = emptyList(),
+            isLoading = false
+        )
     }
 }
